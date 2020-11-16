@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * @author Matěj Přerovský
  */
-public class Main implements ActionListener {
+public class Main  {
 
     private static Window loginWindow, infoWindow;
     private static Bakal bakal;
@@ -15,17 +15,22 @@ public class Main implements ActionListener {
     final private static String notConnectedText = "Žádné internetové připojení!";
     final private static String wrongLoginText = "Vadné přihlašovací údaje.";
     final private static String errorText = "Error";
+    public static String token;
+    public static String baseURL;
+    private static LoginWindow l;
 
     public static void main(String[] args) {
-        getLogin();
+        l = new LoginWindow();
+        l.loginWind();
+        System.out.println(token);
     }
 
-    private static void getLogin() {
+    /*private static void getLogin() {
         loginWindow = new Window("Login");
         loginWindow.login();
     }
 
-    private static void getInfo(){
+    private static void getInfo(String token){
         infoWindow = new Window(bakal.getUserInfo());
         infoWindow.userInfo(bakal);
         loginWindow.dispose(); //dispose the login window
@@ -42,8 +47,8 @@ public class Main implements ActionListener {
             bakal = new Bakal(url);
 
             //-----login-----------------------------------------------------
-            bakal.login(username, String.valueOf(password), false);
-            getInfo();
+            String token = bakal.login(username, String.valueOf(password), false);
+            getInfo(token);
             loginWindow.throwMessage("Úspěšně přihlášeno", "Úspěch", JOptionPane.INFORMATION_MESSAGE);
 
             if(loginWindow.getSaveCheckBox().isSelected())
@@ -51,10 +56,12 @@ public class Main implements ActionListener {
 
         }
     }
-
-    public static void wrongLoginMessage(){ loginWindow.throwMessage(wrongLoginText, wrongLoginText, JOptionPane.WARNING_MESSAGE); }
+*/
+    public static void wrongLoginMessage(){ l.throwMessage(wrongLoginText, wrongLoginText, JOptionPane.WARNING_MESSAGE); }
     public static void wrongAddressOrNoInternetConnectionMessage(){
-        loginWindow.throwMessage("Buď máte špatně URL adresu, nebo nejste připojeni k internetu", "Buď máte špatně URL adresu, nebo nejste připojeni k internetu", JOptionPane.ERROR_MESSAGE);
+        l.throwMessage("Buď máte špatně URL adresu, nebo nejste připojeni k internetu", "Buď máte špatně URL adresu, nebo nejste připojeni k internetu", JOptionPane.ERROR_MESSAGE);
     }
-    public static void errorMessage(){ loginWindow.throwMessage(errorText, errorText, JOptionPane.ERROR_MESSAGE); }
+    public static void errorMessage(){ l.throwMessage(errorText, errorText, JOptionPane.ERROR_MESSAGE); }
+
+
 }
