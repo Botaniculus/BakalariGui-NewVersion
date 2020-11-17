@@ -30,7 +30,7 @@ public class Window extends JFrame {
         this.setResizable(false);
     }
     //-----CSV-------------------------------------
-    public void loadCsv(){
+    /*public void loadCsv(){
         dataArray = new String[2];
         try (BufferedReader br = new BufferedReader(new FileReader("addressAndUsername.txt"))) {
             String s;
@@ -85,6 +85,7 @@ public class Window extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
+    /*
     public void userInfo(Bakal bakal){
         JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -134,6 +135,6 @@ public class Window extends JFrame {
         output[2] = Integer.parseInt(formatter.format(date));
 
         return output;
-    }
+    }*/
 
 }

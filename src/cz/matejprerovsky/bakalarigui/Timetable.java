@@ -14,9 +14,7 @@ public class Timetable {
 
     private String accessToken;
     private URL targetURL;
-    private String[] baseSubjectAbbrev;
     private String got;
-    private int year, month, day;
     final private String[] dayOfWeek = new String[]{"Po", "Út", "Stř", "Čt", "Pá"};//new String[]{"Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek"};
 
     public Timetable(String baseURL, String token, int year, int month, int day){
@@ -48,36 +46,37 @@ public class Timetable {
         hoursAndTimes[0]="";
         return hoursAndTimes;
     }
+    private String[][] getRooms(JSONObject obj){
+        //-----Rooms-----------------------------------------
+        JSONArray rooms = obj.getJSONArray("Rooms");
+        String[][] output = new String[2][rooms.length()];
+
+        for (int b = 0; b < rooms.length(); b++) {
+            JSONObject roomObject = rooms.getJSONObject(b);
+            output[0][b] = roomObject.get("Id").toString();
+            output[1][b] = roomObject.get("Abbrev").toString();
+        }
+        return output;
+    }
+
+    private String[][] getSubjects(JSONObject obj){
+        JSONArray subjectsArray = obj.getJSONArray("Subjects");
+        String[] baseSubjectAbbrev = new String[subjectsArray.length() + 1];
+        String[] baseSubjectId = new String[baseSubjectAbbrev.length];
+        baseSubjectId[0] = baseSubjectAbbrev[0] = "";
+
+        for (int a = 0; a < subjectsArray.length(); a++) {
+            JSONObject subjectObject = subjectsArray.getJSONObject(a);
+
+            baseSubjectAbbrev[a + 1] = subjectObject.getString("Abbrev");
+            baseSubjectId[a + 1] = trim(subjectObject.get("Id").toString());
+        }
+        return new String[][]{baseSubjectId, baseSubjectAbbrev};
+    }
 
     public String[][] getTimetable() {
         String[][] arr = new String[5][13];
-
-        System.out.println(got);
         JSONObject obj = new JSONObject(got);
-
-        //-----Rooms-----------------------------------------
-        JSONArray rooms = obj.getJSONArray("Rooms");
-        String[] roomIds = new String[rooms.length()];
-        String[] roomAbbrevs = new String[rooms.length()];
-        for (int b = 0; b < rooms.length(); b++) {
-            JSONObject room = rooms.getJSONObject(b);
-            roomIds[b] = room.get("Id").toString();
-            roomAbbrevs[b] = room.get("Abbrev").toString();
-        }
-
-        //------------------------
-
-        //-----Subjects----------------------------------------
-        JSONArray subjects = obj.getJSONArray("Subjects");
-        baseSubjectAbbrev = new String[subjects.length() + 1];
-        int[] baseSubjectId = new int[subjects.length() + 1];
-        baseSubjectId[0] = 0; baseSubjectAbbrev[0] = "";
-        for (int a = 0; a < subjects.length(); a++) {
-            JSONObject sub = subjects.getJSONObject(a);
-            baseSubjectAbbrev[a + 1] = sub.getString("Abbrev");
-            baseSubjectId[a + 1] = Integer.parseInt(trim(sub.get("Id").toString()));
-        }
-        //-------------------
 
         //-----Days---------------------------------------------------------------------------
         JSONArray days = obj.getJSONArray("Days");
@@ -98,59 +97,46 @@ public class Timetable {
 
                 int hourId = lesson.getInt("HourId");
 
-                //-----Get room-------------------------
-                String roomId = lesson.get("RoomId").toString();
-                int indexOfRoom = 0;
-                for (int c = 0; c < roomIds.length; c++) {
-                    if (roomId.equals(roomIds[c]))
-                        indexOfRoom = c;
-                }
-                String roomAbbrev = roomAbbrevs[indexOfRoom];
-                //-------------------------
+                String result="";
 
                 //-----Get changes in timetable-----
                 JSONObject changeIs;
-                String changeDescription = "";
                 String change = lesson.get("Change").toString();
+                String roomAbbrev="";
+
                 if (!change.equals("null")) {
                     changeIs = lesson.getJSONObject("Change");
-                    changeDescription = changeIs.get("Description").toString();
-                }
-                //-----------------------------------------------
-
-                //-----Get subject id and find its abbreviation-----
-                String subjectAbbrev = "";
-
-                String subjectIdString = trim(lesson.get("SubjectId"));
-                int subjectId=0;
-                try{
-                    subjectId = Integer.parseInt(subjectIdString);
-                } catch (NumberFormatException e){
+                    result = changeIs.get("Description").toString();
 
                 }
-
-                int indexOfSubject = 0;
-                for (int k = 0; k < baseSubjectId.length; k++) {
-                    if (subjectId == baseSubjectId[k]) {
-                        indexOfSubject = k;
+                else{
+                    //-----Get room-------------------------
+                    String roomId = lesson.get("RoomId").toString();
+                    String[][] rooms = getRooms(obj);
+                    int indexOfRoom = 0;
+                    for (int c = 0; c < rooms[0].length; c++) {
+                        if (roomId.equals(rooms[0][c]))
+                            indexOfRoom = c;
                     }
-                    subjectAbbrev = baseSubjectAbbrev[indexOfSubject];
+                    roomAbbrev = rooms[1][indexOfRoom];
 
+                    //-----Get subject id and find its abbreviation-----
+                    String subjectId = trim(lesson.get("SubjectId"));
+                    String subjectAbbrev = "";
+                    String[][] subjects = getSubjects(obj);
+
+                    int indexOfSubject = 0;
+                    for (int k = 0; k < subjects[0].length; k++) {
+                        if (subjectId.equals(subjects[0][k]))
+                            indexOfSubject = k;
+                    }
+                    subjectAbbrev = subjects[1][indexOfSubject];
+
+                    result =subjectAbbrev+" "+roomAbbrev;
                 }
-                //-----------------------------------------------
-                //---Get theme of lesson---
+
                 //String theme = lesson.get("Theme").toString();
-                //---Print result---
-                String result =/*"\n"+" " + (hourId-2) + ": " + */subjectAbbrev/* + " " +(hourTimes[hourId-2])*/;
-                //if(!theme.equals(""))
-                //result+=" | " + theme;
-
-                result += " " + roomAbbrev;
-                //---If there is some change in timetable, print it---
-                if (!changeDescription.equals(""))
-                    result += " (" + changeDescription + ")";
-
-                arr[i][hourId - 2 + 1] = result;
+                arr[i][hourId -1] = result;
             }
         }
 

@@ -15,7 +15,6 @@ public class LoginWindow extends JFrame{
     private String[] dataArray;
     private String token;
 
-    private Login login;
     private JButton loginBtn;
     private JTextField urlField, username;
     private JPasswordField password;
