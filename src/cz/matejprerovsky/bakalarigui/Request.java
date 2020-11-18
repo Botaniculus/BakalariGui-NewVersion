@@ -16,14 +16,20 @@ public class Request {
         conn = null;
 
         /** -----Http request-------------------------------------------------- */
-        try { conn = (HttpURLConnection) target.openConnection(); } catch (IOException ignored) { }
+        try {
+            conn = (HttpURLConnection) target.openConnection();
+        } catch (IOException ignored) { }
 
         conn.setDoOutput(true);
         conn.setInstanceFollowRedirects(true);
         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         conn.setRequestProperty("charset", "UTF-8");
+
         /** Sets request method (POST or GET) */
-        try { conn.setRequestMethod(method); } catch (ProtocolException e) { Main.errorMessage();}
+        try {
+            conn.setRequestMethod(method);
+        } catch (ProtocolException e) { Main.errorMessage();}
+
         conn.setUseCaches(false);
         if (token != null) conn.setRequestProperty("Authorization", "Bearer " + token);
 
@@ -35,7 +41,7 @@ public class Request {
             catch (IllegalArgumentException illegalArgumentException){
                 Main.wrongAddressOrNoInternetConnectionMessage();
             }
-            catch (IOException ioException){}
+            catch (IOException ignored){}
         }
 
         /** Reads input stream */

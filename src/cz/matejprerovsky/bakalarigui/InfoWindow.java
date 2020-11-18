@@ -6,36 +6,38 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class InfoWindow extends JFrame{
-    final private String loginTitle = "Info";
     final private Timetable timetable;
+    private final Marks marks;
 
     public InfoWindow(String token, String baseURL){
-        this.setTitle("Bakaláři" + " – " + loginTitle);
+        String additionalTitle = "Info";
+        this.setTitle("Bakaláři" + " – " + additionalTitle);
         this.setIconImage(Toolkit.getDefaultToolkit().getImage("baky.png"));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
+
         timetable = new Timetable(baseURL, token, date()[2], date()[1], date()[0]);
+        marks = new Marks(baseURL, token);
     }
     public void userInfo(){
         JTabbedPane tabbedPane = new JTabbedPane();
 
         String[] hoursString=timetable.hours();
         JTable timetableTable = new JTable(timetable.getTimetable(), hoursString);
-        timetableTable.setCellSelectionEnabled(false);
-        //timetableTable.setEnabled(false);
-        timetableTable.setSelectionBackground(Color.BLUE);
-        timetableTable.setRowHeight(50);
-        JTableUtilities.setCellsAlignment(timetableTable, SwingConstants.CENTER);
-        timetableTable.setFont(new Font("Serif", Font.BOLD, 11));
-        JScrollPane scrollTable = new JScrollPane (timetableTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        tabbedPane.addTab("Rozvrh hodin", scrollTable);
-/*
-        String marksString = bakal.getMarks();
+            timetableTable.setCellSelectionEnabled(false);
+            timetableTable.setSelectionBackground(Color.BLUE);
+            timetableTable.setRowHeight(50);
+            JTableUtilities.setCellsAlignment(timetableTable, SwingConstants.CENTER);
+            timetableTable.setFont(new Font("Serif", Font.BOLD, 11));
+            JScrollPane scrollTable = new JScrollPane (timetableTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            tabbedPane.addTab("Rozvrh hodin", scrollTable);
+
+        String marksString = marks.getMarks();
         JTextArea textArea = new JTextArea(marksString);
         textArea.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 15));
         JScrollPane scroll = new JScrollPane (textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         tabbedPane.addTab("Známky", scroll);
-*/
+
         add(tabbedPane);
         setResizable(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

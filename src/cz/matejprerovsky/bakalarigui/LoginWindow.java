@@ -11,18 +11,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class LoginWindow extends JFrame{
-    final private String loginTitle = "Přihlášení";
-    private String[] dataArray;
     private String token;
+    private final String filename = "addressAndUsername.txt";
 
-    private JButton loginBtn;
     private JTextField urlField, username;
     private JPasswordField password;
     private JCheckBox saveCheckBox;
 
 
     public LoginWindow(){
-        this.setTitle("Bakaláři" + " – " + loginTitle);
+        String additionalTitle = "Přihlášení";
+        this.setTitle("Bakaláři" + " – " + additionalTitle);
         this.setIconImage(Toolkit.getDefaultToolkit().getImage("baky.png"));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
@@ -33,32 +32,28 @@ public class LoginWindow extends JFrame{
         pane.setLayout(new GridBagLayout());
         GridBagConstraints g = new GridBagConstraints();
         g.insets = new Insets(5, 5, 5, 5);
-        loadCsv();
-        urlField = new JTextField(dataArray[0], 30);
+
+        String[] addressAndUsernameArray = loadCsv();
+        urlField = new JTextField(addressAndUsernameArray[0], 30);
         g.gridx=0; g.gridy=0; g.gridwidth=3; g.fill = GridBagConstraints.HORIZONTAL;
         pane.add(urlField, g);
-        username = new JTextField(dataArray[1], 12);
+        username = new JTextField(addressAndUsernameArray[1], 12);
         g.gridx=0; g.gridy=1; g.gridwidth=1;
         pane.add(username, g);
         password = new JPasswordField("Password", 12);
         g.gridx=1; g.gridy=1; g.gridwidth=1;
         pane.add(password, g);
-        loginBtn = new JButton("Login");
+        JButton loginBtn = new JButton("Login");
         g.gridx=2; g.gridy=1; g.gridwidth=1;
         pane.add(loginBtn, g);
         loginBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    token = loginBase(urlField.getText(), username.getText(), String.valueOf(password.getPassword()), "");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Main.token=token;
-                Main.baseURL=urlField.getText();
-                System.out.println(Main.token);
+                token = loginBase(urlField.getText(), username.getText(), String.valueOf(password.getPassword()), "");
                 if(saveCheckBox.isSelected())
                     saveCsv(urlField.getText(), username.getText());
+
                 InfoWindow infoWindow = new InfoWindow(token, urlField.getText());
+                disposeLoginWindow();
                 infoWindow.userInfo();
             }
         });
@@ -71,27 +66,26 @@ public class LoginWindow extends JFrame{
         setLocationRelativeTo(null);
         setVisible(true);
     }
+    private void disposeLoginWindow(){ this.dispose(); }
 
-    private void loadCsv(){
-        dataArray = new String[2];
-        try (BufferedReader br = new BufferedReader(new FileReader("addressAndUsername.txt"))) {
+    private String[] loadCsv(){
+        String[] array = new String[2];
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String s;
             while ((s = br.readLine()) != null) {
-                dataArray = s.split(";");
+                array = s.split(";");
             }
         }
         catch(IOException e){
-            dataArray[0]="https://";
-            dataArray[1]="username";
+            array[0]="https://";
+            array[1]="username";
         }
+        return array;
     }
-    /**
-     * @param url
-     * @param username
-     */
+
     private void saveCsv(String url, String username){
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter("addressAndUsername.txt"));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
             String[] values = {url, username};
             String line = String.join(";", values);
             bw.append(line);
@@ -105,6 +99,7 @@ public class LoginWindow extends JFrame{
     //--------------------------------------
 
     /**
+     * Throws message dialogs
      * @param title
      * Title of dialog
      * @param error
@@ -116,7 +111,7 @@ public class LoginWindow extends JFrame{
         JOptionPane.showMessageDialog(this, error, title, type);
     }
 
-    private String loginBase(String baseURL, String username, String password, String refreshToken) throws IOException {
+    private String loginBase(String baseURL, String username, String password, String refreshToken) {
         URL targetURL=null;
         String data;
 
@@ -131,10 +126,9 @@ public class LoginWindow extends JFrame{
         String got = new Request().request(targetURL, "POST", data, null);
 
         JSONObject obj = new JSONObject(got);
-        String accessToken = obj.getString("access_token");
         //String refreshToken = obj.getString("refresh_token");
 
-        return accessToken;
+        return obj.getString("access_token");
     }
 
 }

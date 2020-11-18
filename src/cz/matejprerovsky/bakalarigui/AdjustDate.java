@@ -1,6 +1,6 @@
 package cz.matejprerovsky.bakalarigui;
 
-public class adjustDate {
+public class AdjustDate {
     public String getDate(String dateString) {
         String[] dateInt = dateString.split("-");
         dateInt[2] = dateInt[2].substring(0, 2);

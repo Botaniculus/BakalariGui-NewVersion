@@ -3,27 +3,23 @@ package cz.matejprerovsky.bakalarigui;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import static jdk.nashorn.internal.objects.NativeString.trim;
 
 public class Timetable {
-    private adjustDate date=new adjustDate();
-
-    private String accessToken;
+    private final AdjustDate date=new AdjustDate();
     private URL targetURL;
-    private String got;
+    private final String got;
     final private String[] dayOfWeek = new String[]{"Po", "Út", "Stř", "Čt", "Pá"};//new String[]{"Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek"};
 
     public Timetable(String baseURL, String token, int year, int month, int day){
-        this.accessToken=token;
         try {
             targetURL = new URL(baseURL + "/api/3/timetable/actual?date=" + year + "-" + month + "-" + day);
-        } catch (MalformedURLException e) { }
+        } catch (MalformedURLException ignored) { }
 
-        got = new Request().request(targetURL, "GET", null, accessToken);
+        got = new Request().request(targetURL, "GET", null, token);
 
     }
 
@@ -46,6 +42,7 @@ public class Timetable {
         hoursAndTimes[0]="";
         return hoursAndTimes;
     }
+
     private String[][] getRooms(JSONObject obj){
         //-----Rooms-----------------------------------------
         JSONArray rooms = obj.getJSONArray("Rooms");
@@ -97,12 +94,12 @@ public class Timetable {
 
                 int hourId = lesson.getInt("HourId");
 
-                String result="";
+                String result;
 
                 //-----Get changes in timetable-----
                 JSONObject changeIs;
                 String change = lesson.get("Change").toString();
-                String roomAbbrev="";
+                String roomAbbrev;
 
                 if (!change.equals("null")) {
                     changeIs = lesson.getJSONObject("Change");
@@ -122,7 +119,7 @@ public class Timetable {
 
                     //-----Get subject id and find its abbreviation-----
                     String subjectId = trim(lesson.get("SubjectId"));
-                    String subjectAbbrev = "";
+                    String subjectAbbrev;
                     String[][] subjects = getSubjects(obj);
 
                     int indexOfSubject = 0;
@@ -139,7 +136,6 @@ public class Timetable {
                 arr[i][hourId -1] = result;
             }
         }
-
         return arr;
     }
 
