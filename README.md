@@ -16,8 +16,8 @@ To make it look native (GTK) you have to add this to your ~/.profile file:
 
 export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
 
-There is also an another way - bash script with binary payload. Download .jar and stub.sh and type this to your terminal:
+There is also an another way - bash script with binary payload. Download untitled104.jar and stub.sh and type this to your terminal:
 
-cat stub.sh [the name].jar > BakalariGui && chmod +x BakalariGui
+cat stub.sh untitled104.jar > BakalariGui && chmod +x BakalariGui
 
 Then you can just run BakalariGui and it will run the jar file with GTKLookAndFeel.
