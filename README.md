@@ -1,6 +1,9 @@
 # BakalariGui
 BakalariGui is graphical version of https://github.com/Botaniculus/bakalari-client. It's made with Java Swing. 
 
+# Refresh
+You can now use refresh token to refresh marks and timetable. 
+
 # addressAndUsername.txt
 I added check box to Login window. If the checkbox is selected, it will save the URL and username values to csv txt file. On next startup, it will automatically load these values to Text Fields
 Format of addressAndUsername.txt:
