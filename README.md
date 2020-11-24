@@ -12,8 +12,12 @@ URL;username
 ![alt text](loginWindow.png)
 
 # For Linux users:
-To make it look native (GTK) you must add this to your ~/.profile file:
+To make it look native (GTK) you have to add this to your ~/.profile file:
 
 export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
 
-You can also download .run file, which is bash script with binary java payload. It has export _JAVA_OPTIONS=... in it.
+There is also an another way - bash script with binary payload. Download .jar and stub.sh and type this to your terminal:
+
+cat stub.sh [the name].jar > BakalariGui && chmod +x BakalariGui
+
+Then you can just run BakalariGui and it will run the jar file with GTKLookAndFeel.
