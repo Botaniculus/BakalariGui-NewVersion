@@ -2,14 +2,21 @@ package cz.matejprerovsky.bakalarigui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class InfoWindow extends JFrame{
+public class InfoWindow extends JFrame implements ActionListener{
     final private Timetable timetable;
     private final Marks marks;
+    private LoginToBakalari loginToBakalari;
+    private String baseURL, refreshToken;
+    public InfoWindow(String token, String refreshToken, LoginToBakalari loginToBakalari){
+        this.refreshToken=refreshToken;
+        this.loginToBakalari=loginToBakalari;
+        baseURL = loginToBakalari.getBaseURL();
 
-    public InfoWindow(String token, String baseURL){
         String additionalTitle = "Info";
         this.setTitle("Bakaláři" + " – " + additionalTitle);
         this.setIconImage(Toolkit.getDefaultToolkit().getImage("baky.png"));
@@ -18,6 +25,18 @@ public class InfoWindow extends JFrame{
 
         timetable = new Timetable(baseURL, token, date()[2], date()[1], date()[0]);
         marks = new Marks(baseURL, token);
+
+        /**
+         * Menu
+         */
+        JMenuBar menuBar = new JMenuBar();
+        JMenu refreshMenu = new JMenu("Refresh");
+        JMenuItem refreshItem = new JMenuItem("Refresh");
+        refreshMenu.add(refreshItem);
+        menuBar.add(refreshMenu);
+        this.setJMenuBar(menuBar);
+
+        refreshItem.addActionListener(this);
     }
     public void userInfo(){
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -62,5 +81,13 @@ public class InfoWindow extends JFrame{
         output[2] = Integer.parseInt(formatter.format(date));
 
         return output;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent actionEvent) {
+        loginToBakalari.login(refreshToken);
+        InfoWindow infoWindow = new InfoWindow(loginToBakalari.getAccessToken(), loginToBakalari.getRefreshToken(), loginToBakalari);
+        infoWindow.userInfo();
+        this.dispose();
     }
 }

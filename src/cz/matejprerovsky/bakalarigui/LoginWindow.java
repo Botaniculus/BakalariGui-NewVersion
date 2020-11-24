@@ -48,11 +48,13 @@ public class LoginWindow extends JFrame{
         pane.add(loginBtn, g);
         loginBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                token = loginBase(urlField.getText(), username.getText(), String.valueOf(password.getPassword()), "");
+                LoginToBakalari loginToBakalari = new LoginToBakalari(urlField.getText(), username.getText(), password.getPassword());
+                loginToBakalari.login(null);
                 if(saveCheckBox.isSelected())
                     saveCsv(urlField.getText(), username.getText());
 
-                InfoWindow infoWindow = new InfoWindow(token, urlField.getText());
+                InfoWindow infoWindow = new InfoWindow(loginToBakalari.getAccessToken(), loginToBakalari.getRefreshToken(), loginToBakalari);
+
                 disposeLoginWindow();
                 infoWindow.userInfo();
             }
@@ -111,24 +113,5 @@ public class LoginWindow extends JFrame{
         JOptionPane.showMessageDialog(this, error, title, type);
     }
 
-    private String loginBase(String baseURL, String username, String password, String refreshToken) {
-        URL targetURL=null;
-        String data;
-
-        if (refreshToken.length()==0)
-            data = "client_id=ANDR&grant_type=password&username=" + username + "&password=" + password;
-        else
-            data = "client_id=ANDR&grant_type=refresh_token&refresh_token=" + refreshToken;
-
-        try { targetURL = new URL(baseURL + "/api/login");
-        } catch (MalformedURLException ignored) { }
-
-        String got = new Request().request(targetURL, "POST", data, null);
-
-        JSONObject obj = new JSONObject(got);
-        //String refreshToken = obj.getString("refresh_token");
-
-        return obj.getString("access_token");
-    }
 
 }

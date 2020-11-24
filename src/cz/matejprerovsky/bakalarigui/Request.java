@@ -47,11 +47,14 @@ public class Request {
         /** Reads input stream */
         try(BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
             String currentLine;
-            while ((currentLine = in.readLine()) != null) { output += currentLine; }
-            System.out.println(output);
+            while ((currentLine = in.readLine()) != null)
+                output += currentLine;
+
+
         }
         catch (IOException e){
             Main.wrongLoginMessage();
+            System.out.println(output);
         }
 
         return output;
