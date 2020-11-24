@@ -12,6 +12,7 @@ public class InfoWindow extends JFrame implements ActionListener{
     private final Marks marks;
     private LoginToBakalari loginToBakalari;
     private String baseURL, refreshToken;
+
     public InfoWindow(String token, String refreshToken, LoginToBakalari loginToBakalari){
         this.refreshToken=refreshToken;
         this.loginToBakalari=loginToBakalari;
