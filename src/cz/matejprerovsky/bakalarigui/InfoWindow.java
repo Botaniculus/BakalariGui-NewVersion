@@ -62,7 +62,10 @@ public class InfoWindow extends JFrame implements ActionListener{
         setResizable(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
-        setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+
+
         setVisible(true);
     }
     private int[] date(){

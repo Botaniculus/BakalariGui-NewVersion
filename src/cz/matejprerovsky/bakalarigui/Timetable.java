@@ -5,6 +5,8 @@ import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import static jdk.nashorn.internal.objects.NativeString.trim;
 
@@ -43,32 +45,26 @@ public class Timetable {
         return hoursAndTimes;
     }
 
-    private String[][] getRooms(JSONObject obj){
+    private HashMap<String, String> getRooms(JSONObject obj){
         //-----Rooms-----------------------------------------
         JSONArray rooms = obj.getJSONArray("Rooms");
-        String[][] output = new String[2][rooms.length()];
-
+        HashMap<String, String> roomsMap = new HashMap<>();
         for (int b = 0; b < rooms.length(); b++) {
             JSONObject roomObject = rooms.getJSONObject(b);
-            output[0][b] = roomObject.get("Id").toString();
-            output[1][b] = roomObject.get("Abbrev").toString();
+            roomsMap.put(roomObject.get("Id").toString(), roomObject.get("Abbrev").toString());
         }
-        return output;
+        return roomsMap;
     }
 
-    private String[][] getSubjects(JSONObject obj){
+    private HashMap<String, String> getSubjects(JSONObject obj){
         JSONArray subjectsArray = obj.getJSONArray("Subjects");
-        String[] baseSubjectAbbrev = new String[subjectsArray.length() + 1];
-        String[] baseSubjectId = new String[baseSubjectAbbrev.length];
-        baseSubjectId[0] = baseSubjectAbbrev[0] = "";
+        HashMap<String, String > subjectsMap = new HashMap<>();
 
         for (int a = 0; a < subjectsArray.length(); a++) {
             JSONObject subjectObject = subjectsArray.getJSONObject(a);
-
-            baseSubjectAbbrev[a + 1] = subjectObject.getString("Abbrev");
-            baseSubjectId[a + 1] = trim(subjectObject.get("Id").toString());
+            subjectsMap.put(trim(subjectObject.get("Id").toString()), subjectObject.getString("Abbrev"));
         }
-        return new String[][]{baseSubjectId, baseSubjectAbbrev};
+        return subjectsMap;
     }
 
     public String[][] getTimetable() {
@@ -87,7 +83,8 @@ public class Timetable {
             arr[i][0] = (dayOfWeekString + " " + date.getDate(dateString));
             //----------------------------------
 
-            //-----Lessons--------------------------------------------------
+
+            //-----Lessons-------------------------------------------------
             JSONArray atoms = den.getJSONArray("Atoms");
             for (int j = 0; j < atoms.length(); j++) {
                 JSONObject lesson = atoms.getJSONObject(j);
@@ -107,27 +104,8 @@ public class Timetable {
 
                 }
                 else{
-                    //-----Get room-------------------------
-                    String roomId = lesson.get("RoomId").toString();
-                    String[][] rooms = getRooms(obj);
-                    int indexOfRoom = 0;
-                    for (int c = 0; c < rooms[0].length; c++) {
-                        if (roomId.equals(rooms[0][c]))
-                            indexOfRoom = c;
-                    }
-                    roomAbbrev = rooms[1][indexOfRoom];
-
-                    //-----Get subject id and find its abbreviation-----
-                    String subjectId = trim(lesson.get("SubjectId"));
-                    String subjectAbbrev;
-                    String[][] subjects = getSubjects(obj);
-
-                    int indexOfSubject = 0;
-                    for (int k = 0; k < subjects[0].length; k++) {
-                        if (subjectId.equals(subjects[0][k]))
-                            indexOfSubject = k;
-                    }
-                    subjectAbbrev = subjects[1][indexOfSubject];
+                    roomAbbrev = (getRooms(obj)).get(lesson.get("RoomId").toString());
+                    String subjectAbbrev = getSubjects(obj).get(trim(lesson.get("SubjectId")));
 
                     result =subjectAbbrev+" "+roomAbbrev;
                 }
